@@ -1,27 +1,35 @@
 package com.tenniscourts.reservations;
-
 import com.tenniscourts.config.BaseRestController;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+@RestController
 @AllArgsConstructor
-public class ReservationController extends BaseRestController {
+@RequestMapping("reservation")
+public class ReservationController extends BaseRestController implements ReservationAPI {
 
     private final ReservationService reservationService;
 
-    public ResponseEntity<Void> bookReservation(CreateReservationRequestDTO createReservationRequestDTO) {
+    @PostMapping
+    public ResponseEntity<Void> bookReservation(@RequestBody CreateReservationRequestDTO createReservationRequestDTO) {
         return ResponseEntity.created(locationByEntity(reservationService.bookReservation(createReservationRequestDTO).getId())).build();
     }
 
-    public ResponseEntity<ReservationDTO> findReservation(Long reservationId) {
+    @GetMapping("/{reservationId}")
+    public ResponseEntity<ReservationDTO> findReservation(@PathVariable(value = "reservationId") Long reservationId) {
         return ResponseEntity.ok(reservationService.findReservation(reservationId));
     }
 
-    public ResponseEntity<ReservationDTO> cancelReservation(Long reservationId) {
+    @GetMapping("/cancel/{id}")
+    public ResponseEntity<ReservationDTO> cancelReservation(@PathVariable(value = "id") Long reservationId) {
         return ResponseEntity.ok(reservationService.cancelReservation(reservationId));
     }
 
-    public ResponseEntity<ReservationDTO> rescheduleReservation(Long reservationId, Long scheduleId) {
+    @PutMapping(path="/reschedule/{reservationId}/{scheduleId}")
+    public ResponseEntity<ReservationDTO> rescheduleReservation(
+            @PathVariable(value = "reservationId") Long reservationId,
+            @PathVariable(value = "scheduleId") Long scheduleId) {
         return ResponseEntity.ok(reservationService.rescheduleReservation(reservationId, scheduleId));
     }
 }
